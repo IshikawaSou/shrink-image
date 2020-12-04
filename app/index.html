@@ -11,7 +11,7 @@
     <title>ImageShrink</title>
 </head>
 
-<body>
+<body style="background: mediumpurple; text-align: center;">
     <div class="container center-align">
         <h3><i class="fas fa-images"></i>ImageShrink</h3>
         <p>choose an image to resize</p>
@@ -28,7 +28,7 @@
             </div>
             <p>
                 <strong>Quarity:</strong>
-                <em>the lower the querity, the smaller the file size</em>
+                <em>the lower querity, the smaller the file size</em>
             </p>
             <p>
             <div class="range-field">
@@ -45,6 +45,41 @@
     </div>
 
     <script src="js/materialize.min.js"></script>
+    <script>
+        const path = require('path');
+        const os = require('os');
+        const { ipcRenderer } = require('electron');
+
+        const form = document.getElementById('image-form');
+        const slider = document.getElementById('slider');
+        const img = document.getElementById('img');
+
+        document.getElementById('output-path').innerText = path.join(os.homedir(),
+            'imageshrink'
+        );
+
+        // on submit
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const imgPath = img.files[0].path;
+            const quality = slider.value;
+
+            ipcRenderer.send("image:minimize",
+                {
+                    imgPath,
+                    quality
+                }
+            );
+        });
+
+        // on done
+        ipcRenderer.on('image:done', () => {
+            M.toast({
+                html: `image resize to ${slider.value}% quality`
+            });
+        });
+    </script>
 </body>
 
 </html>
